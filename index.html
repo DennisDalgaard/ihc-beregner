@@ -67,6 +67,7 @@
   .prod h3{font-size:16.5px; font-weight:800;}
   .prod .ean{font-size:12.5px; color:var(--grey); font-weight:600; margin-top:2px;}
   .prod .note{font-size:12.5px; color:var(--grey); line-height:1.45; margin-top:6px; max-width:520px;}
+  .prod .note .bem{display:block; margin-top:6px; padding-left:9px; border-left:3px solid var(--shellyblue); color:var(--midnight);}
   .qty{background:var(--lime); border-radius:12px; padding:10px 16px; text-align:center; min-width:78px;}
   .qty b{display:block; font-size:24px; font-weight:800; line-height:1;}
   .qty span{font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.8px;}
@@ -196,7 +197,8 @@ const PRODUCTS = {
   rgbww:  {name:"Shelly Pro RGBWW PM", ean:"3800235268216", din:1, img:IMG.rgbww,
            note:"Anvendes som 5-kanals 24V inputmodul til DIN-skinne. Indgangene styrer relæer og dæmpere trådløst og understøtter kort, dobbelt, tredobbelt og langt tryk."},
   blu4:   {name:"Shelly BLU Wall Switch 4 ZB DK White", ean:"3800238073404", din:0, img:IMG.blu4,
-           note:"Trådløst Bluetooth-batteritryk med 4 knapper i dansk LK-design. Parres direkte med Shelly-enheder eller via scener i appen."},
+           note:"Trådløst Bluetooth-batteritryk med 4 knapper i dansk LK-design. Parres direkte med Shelly-enheder eller via scener i appen."+
+                "<span class=\"bem\"><b>Bemærk:</b> Batteritrykket skal kommunikere direkte med lysdæmperen/relæet. Rækkevidden kan variere afhængig af vægge, vinduer mm. og er typisk 10-30 meter.</span>"},
   relay24:{name:"Overdragsrelæ / interface-relæ 24V", ean:"– (ikke et Shelly-produkt)", din:null, img:null,
            note:"Konverterer 24V-tryksignalet til relæets/dæmperens indgang. Kan fx købes hos elsag.dk (interface-/hjælperelæ 24V, 1 omskifter)."}
 };
