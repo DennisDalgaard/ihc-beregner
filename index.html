@@ -67,6 +67,7 @@
   .prod:last-child{border-bottom:none;}
   .prod img{width:92px; height:92px; object-fit:contain; border:1px solid var(--line); border-radius:10px; background:#fff;}
   .prod .noimg{width:92px; height:92px; border:1px dashed var(--line); border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--grey); font-size:11px; text-align:center; padding:6px;}
+  .prod .noimg.brand{border-style:solid; background:#f6fafd url("img/asset10.png") center/62% no-repeat;}
   .prod h3{font-size:16.5px; font-weight:800;}
   .prod .ean{font-size:12.5px; color:var(--grey); font-weight:600; margin-top:2px;}
   .prod .note{font-size:12.5px; color:var(--grey); line-height:1.45; margin-top:6px; max-width:520px;}
@@ -141,7 +142,7 @@
     #report{display:block !important; margin:0;}
     .report-card{box-shadow:none; border-radius:0;}
     .rep-head{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
-    .qty, .tot, .chip, .notes, .guide{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
+    .qty, .tot, .chip, .notes, .guide, .prod .noimg.brand{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
     .prod{break-inside:avoid;}
     a{text-decoration:none;}
     /* På papir er linket dødt – skriv adressen ud, så den kan tastes ind. */
@@ -246,6 +247,10 @@ const PRODUCTS = {
            note:"Relæ med 3 potentialfrie udgange og 3 indgange. Forsynes med 24V DC, så svagstrømstryk kobles direkte på indgangene. Har ikke energimåling."},
   pro4pm: {name:"Shelly Pro 4PM", ean:"3800235268049", din:3, img:IMG.pro4pm,
            note:"4-kanals relæ med energimåling pr. kanal og display. Forsynes med 230V – 24V tryk tilsluttes via overdragsrelæ."},
+  pro2pm: {name:"Shelly Pro 2PM", ean:"3800235268032", din:1, img:null,
+           note:"2-kanals relæ med energimåling pr. kanal. Forsynes med 230V – 24V tryk tilsluttes via overdragsrelæ. Fylder kun 1 modul i tavlen."},
+  pro1pm: {name:"Shelly Pro 1PM", ean:"3800235268018", din:1, img:null,
+           note:"1-kanals relæ med energimåling. Forsynes med 230V – 24V tryk tilsluttes via overdragsrelæ. Fylder kun 1 modul i tavlen."},
   dim2pm: {name:"Shelly Pro Dimmer 2PM", ean:"3800235268179", din:1, img:IMG.dim2pm,
            note:"2-kanals lysdæmper med energimåling. 230V-enhed – ved fortrådet trykstyring anvendes overdragsrelæ pr. kanal."},
   dim1pm: {name:"Shelly Pro Dimmer 1PM", ean:"3800235268162", din:1, img:IMG.dim1pm,
@@ -256,24 +261,32 @@ const PRODUCTS = {
            note:"Trådløst Bluetooth-batteritryk med 4 knapper i dansk LK-design. Parres direkte med Shelly-enheder eller via scener i appen."+
                 "<span class=\"bem\"><b>Bemærk:</b> Batteritrykket skal kommunikere direkte med lysdæmperen/relæet. Rækkevidden kan variere afhængig af vægge, vinduer mm. og er typisk 10-30 meter.</span>"},
   relay24:{name:"Overdragsrelæ / interface-relæ 24V", ean:"– (ikke et Shelly-produkt)", din:null, img:null,
+           noimg:"Se leverandør<br>(fx elsag.dk)",
            note:"Konverterer 24V-tryksignalet til relæets/dæmperens indgang."+
                 "<span class=\"bem\"><b>Anbefalet:</b> <a href=\"https://www.elsag.dk/interface-hjaelpe-relae-24v-1-omskifter\" target=\"_blank\" rel=\"noopener\">Interface-/hjælperelæ 24V, 1 omskifter, 8A</a> hos elsag.dk.</span>"}
 };
 
-// Relæer uden energimåling. Rækkefølgen bestemmer pakningen: størst først holder
-// antallet af fysiske enheder nede. Byttes Pro 3 og Pro 2 om, prioriteres i stedet
-// færrest DIN-moduler (Pro 2 giver 2 kanaler pr. modul, Pro 3 giver 3 pr. 3 moduler).
+// Relæ-lineups, størst først. Rækkefølgen bestemmer pakningen: den holder antallet
+// af enheder nede og undgår at betale for kanaler, der ikke bruges – 5 udgange med
+// energimåling bliver fx 1× Pro 4PM + 1× Pro 1PM frem for 2× Pro 4PM. Flyttes en
+// smallere enhed frem, prioriteres i stedet færrest DIN-moduler (Pro 2 og Pro 2PM
+// giver 2 kanaler pr. modul, mens Pro 3 og Pro 4PM giver færre).
 const RELAY_LINEUP = [
   {key:'pro3', ch:3},
   {key:'pro2', ch:2},
   {key:'pro1', ch:1}
 ];
+const PM_LINEUP = [
+  {key:'pro4pm', ch:4},
+  {key:'pro2pm', ch:2},
+  {key:'pro1pm', ch:1}
+];
 
-function addRelays(n, add){
+function addRelays(lineup, n, add){
   let left = n;
-  RELAY_LINEUP.forEach((r, i) => {
+  lineup.forEach((r, i) => {
     // Den mindste enhed dækker resten; de øvrige tager kun hele multipla.
-    const qty = (i === RELAY_LINEUP.length-1) ? Math.ceil(left/r.ch) : Math.floor(left/r.ch);
+    const qty = (i === lineup.length-1) ? Math.ceil(left/r.ch) : Math.floor(left/r.ch);
     if (qty > 0){ add(r.key, qty); left = Math.max(0, left - qty*r.ch); }
   });
 }
@@ -363,8 +376,7 @@ function calc(scroll){
   const add = (key, qty) => { if(qty>0) items.push({key, qty}); };
 
   // --- Relæer: antallet følger alene de ønskede relæudgange ---
-  if (pm) add('pro4pm', Math.ceil(relay/4));
-  else    addRelays(relay, add);
+  addRelays(pm ? PM_LINEUP : RELAY_LINEUP, relay, add);
 
   // --- Lysdæmpere ---
   add('dim2pm', Math.floor(dim/2));
@@ -420,9 +432,11 @@ function render(items, notes, a, scroll){
 
   const rows = items.map(i => {
     const p = PRODUCTS[i.key];
-    const img = p.img
-      ? '<img src="'+p.img+'" alt="'+p.name+'">'
-      : '<div class="noimg">Se leverandør<br>(fx elsag.dk)</div>';
+    // Uden produktfoto: leverandørhenvisning hvis produktet har en, ellers
+    // Shelly-mærket, så rækken ikke ser ud som om noget mangler.
+    const img = p.img ? '<img src="'+p.img+'" alt="'+p.name+'">'
+      : p.noimg ? '<div class="noimg">'+p.noimg+'</div>'
+      : '<div class="noimg brand" role="img" aria-label="Shelly"></div>';
     return '<div class="prod">'+img+
       '<div class="info"><h3>'+p.name+'</h3><div class="ean">EAN: '+p.ean+'</div><div class="note">'+p.note+'</div></div>'+
       '<div class="qty"><b>'+i.qty+'</b><span>stk.</span></div></div>';
