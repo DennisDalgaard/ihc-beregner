@@ -123,9 +123,9 @@
   <section class="card" aria-label="Spørgsmål">
     <h2>Om installationen</h2>
     <div class="qgrid">
-      <div class="q">
+      <div class="q" id="q24" hidden>
         <label for="inp24">1. Antal 24V trykindgange</label>
-        <div class="hint">Tæl <b>indgange</b>, ikke knapper – flere tryk kan deles om samme indgang, når de skal styre samme udgang.</div>
+        <div class="hint">Tæl <b>indgange</b>, ikke knapper – flere tryk kan deles om samme indgang, når de skal styre samme udgang. Bruges til at dimensionere inputmodulerne.</div>
         <input type="number" id="inp24" min="0" value="0" inputmode="numeric">
       </div>
       <div class="q">
@@ -203,17 +203,25 @@ const PRODUCTS = {
            note:"Konverterer 24V-tryksignalet til relæets/dæmperens indgang. Kan fx købes hos elsag.dk (interface-/hjælperelæ 24V, 1 omskifter)."}
 };
 
-function toggleInit(id){
+function toggleInit(id, onChange){
   const t = document.getElementById(id);
   t.querySelectorAll('button').forEach(b=>{
     b.addEventListener('click', ()=>{
       t.querySelectorAll('button').forEach(x=>x.classList.remove('on'));
       b.classList.add('on');
+      if (onChange) onChange();
     });
   });
 }
-toggleInit('togPM'); toggleInit('togMod');
 const togVal = id => document.querySelector('#'+id+' button.on').dataset.v === 'ja';
+
+// Antallet af 24V trykindgange bruges kun til at dimensionere inputmodulerne i
+// Metode 2. Uden inputmoduler er trykkene fortrådet direkte på relæets/dæmperens
+// indgang, og antallet af enheder følger alene relæ- og dæmperkanalerne.
+function syncQ24(){ document.getElementById('q24').hidden = !togVal('togMod'); }
+
+toggleInit('togPM'); toggleInit('togMod', syncQ24);
+syncQ24();
 
 function calc(){
   const in24  = Math.max(0, parseInt(document.getElementById('inp24').value)  || 0);
@@ -227,43 +235,40 @@ function calc(){
   const notes = [];
   const add = (key, qty) => { if(qty>0) items.push({key, qty}); };
 
+  // --- Relæer: antallet følger alene de ønskede relæudgange ---
+  if (pm){
+    add('pro4pm', Math.ceil(relay/4));
+  } else {
+    // Pro 2 dækker 2 udgange pr. DIN-modul; en ulige rest tages af Pro 1.
+    add('pro2', Math.floor(relay/2));
+    add('pro1', relay % 2);
+  }
+
   // --- Lysdæmpere ---
   add('dim2pm', Math.floor(dim/2));
   add('dim1pm', dim % 2);
 
-  let relay24 = 0; // overdragsrelæer
+  // --- Inputmoduler (Metode 2) ---
+  if (mod2) add('rgbww', Math.ceil(in24/5));
 
-  if (mod2){
-    // Metode 2: særskilte inputmoduler – alle 24V indgange samles i Pro RGBWW PM
-    add('rgbww', Math.ceil(in24/5));
-    if (pm){
-      add('pro4pm', Math.ceil(relay/4));
-    } else {
-      add('pro2', Math.ceil(relay/2));
-    }
-    if (in24>0) notes.push("Metode 2: Indgangene på Shelly Pro RGBWW PM programmeres til at styre relæer og dæmpere – enten som scener i Shelly-appen eller via Direct Device-to-Device (lokalt WiFi).");
-    if (dim>0) notes.push("Lysdæmperne styres trådløst fra inputmodulet – der kræves ingen overdragsrelæer.");
-  } else if (pm){
-    // Energimåling: Pro 4PM + overdragsrelæ pr. 24V trykindgang (relæer og dæmpere)
-    add('pro4pm', Math.ceil(relay/4));
-    relay24 = in24;
-    if (in24>0) notes.push("Energimåling kræver 230V-forsyning af relæerne. Alle 24V trykindgange tilsluttes derfor via overdragsrelæer – lidt mere fortrådning, men minimal programmering.");
-  } else {
-    // Metode 1: kiprelæ – Pro 2 forsynes 24V, tryk direkte på indgangene
-    const dimInputs = Math.min(in24, dim);        // dæmper-indgange kræver overdragsrelæ
-    const relayInputs = in24 - dimInputs;
-    const need = Math.max(relayInputs, relay);
-    if (need > 0){
-      if (need % 2 === 1){ add('pro2', Math.floor(need/2)); add('pro1', 1); }
-      else { add('pro2', need/2); }
-    }
-    relay24 = dimInputs;
-    notes.push("Metode 1 (kiprelæ): Relæerne forsynes med 24V DC, og trykkene kobles direkte på indgangene. Basale tænd/sluk-funktioner virker altid – også uden WiFi og internet.");
-    if (dimInputs>0) notes.push("Lysdæmperne er 230V-enheder og kan ikke styres direkte med 24V. Der er derfor medregnet ét overdragsrelæ pr. dæmperkanal med fortrådet tryk.");
-  }
+  // --- Overdragsrelæer ---
+  // Lysdæmpere og PM-relæer er 230V-enheder og kan ikke tage 24V-tryksignalet
+  // direkte, så de får ét overdragsrelæ pr. kanal. I Metode 2 går alle tryk i
+  // inputmodulet og styringen sker trådløst – der er derfor ingen overdragsrelæer.
+  add('relay24', mod2 ? 0 : dim + (pm ? relay : 0));
 
-  add('relay24', relay24);
   add('blu4', blu);
+
+  // --- Bemærkninger ---
+  if (mod2){
+    notes.push("Metode 2: Indgangene på Shelly Pro RGBWW PM programmeres til at styre relæer og dæmpere – enten som scener i Shelly-appen eller via Direct Device-to-Device (lokalt WiFi). Der er derfor ikke medregnet overdragsrelæer.");
+    if (in24 === 0) notes.push("Der er ikke angivet nogen 24V trykindgange, så materialelisten indeholder ingen inputmoduler. Udfyld felt 1, hvis der skal fortrådes tryk.");
+  } else if (pm){
+    notes.push("Energimåling kræver, at relæerne forsynes med 230V. Hver relæudgang med fortrådet tryk styres derfor via et overdragsrelæ – lidt mere fortrådning, men minimal programmering.");
+  } else {
+    notes.push("Metode 1 (kiprelæ): Relæerne forsynes med 24V DC, og trykkene kobles direkte på indgangene. Basale tænd/sluk-funktioner virker altid – også uden WiFi og internet.");
+  }
+  if (!mod2 && dim>0) notes.push("Lysdæmperne er 230V-enheder og kan ikke styres direkte med 24V. Der er derfor medregnet ét overdragsrelæ pr. dæmperkanal.");
   if (blu>0) notes.push("Batteritrykkene (BLU Wall Switch 4) parres trådløst med Shelly-enhederne – enten direkte via Bluetooth eller gennem scener i Shelly-appen.");
   notes.push("Ved belastning over 5A på en udgang skal der være minimum 10 mm luft omkring enheden for korrekt varmeafledning.");
 
@@ -297,13 +302,14 @@ function render(items, notes, a){
   }).join('');
 
   const chips = [
-    '<span class="chip">24V trykindgange: <b>'+a.in24+'</b></span>',
+    // 24V trykindgange indgår kun i beregningen, når der bruges inputmoduler.
+    a.mod2 ? '<span class="chip">24V trykindgange: <b>'+a.in24+'</b></span>' : '',
     '<span class="chip">Batteritryk: <b>'+a.blu+'</b></span>',
     '<span class="chip">230V relæudgange: <b>'+a.relay+'</b></span>',
     '<span class="chip">Lysdæmper-kanaler: <b>'+a.dim+'</b></span>',
     '<span class="chip">Energimåling: <b>'+(a.pm?'Ja':'Nej')+'</b></span>',
     '<span class="chip">Særskilte inputmoduler: <b>'+(a.mod2?'Ja (Metode 2)':'Nej')+'</b></span>'
-  ].join('');
+  ].filter(Boolean).join('');
 
   rep.innerHTML =
   '<div class="report-card">'+
