@@ -213,6 +213,7 @@
     <div class="actions">
       <button class="btn btn-primary" id="btnCalc">Beregn materialeliste</button>
       <button class="btn btn-ghost" id="btnPrint">Gem / print som PDF</button>
+      <button class="btn btn-ghost" id="btnShare">Kopiér link til beregningen</button>
     </div>
   </section>
 
@@ -284,27 +285,71 @@ function toggleInit(id, onChange){
   });
 }
 const togVal = id => document.querySelector('#'+id+' button.on').dataset.v === 'ja';
+const numVal = id => Math.max(0, parseInt(document.getElementById(id).value) || 0);
 
-// Felt 7 → 6 → 1: Uden fortrådede tryk er der intet at føre ind i et inputmodul,
-// og antallet af 24V trykindgange bruges kun til at dimensionere inputmodulerne i
-// Metode 2. Uden inputmoduler er trykkene fortrådet direkte på relæets/dæmperens
-// indgang, og antallet af enheder følger alene relæ- og dæmperkanalerne.
+// Uden fortrådede tryk er der intet at føre ind i et inputmodul, og antallet af
+// 24V trykindgange bruges kun til at dimensionere inputmodulerne i Metode 2. Uden
+// inputmoduler er trykkene fortrådet direkte på relæets/dæmperens indgang, og
+// antallet af enheder følger alene relæ- og dæmperkanalerne. Begge felter ligger
+// sidst i hver sektion, så et klik aldrig flytter noget over det man klikkede på.
 function syncFields(){
   const wired = togVal('togWired');
   document.getElementById('qMod').hidden = !wired;
   document.getElementById('q24').hidden  = !(wired && togVal('togMod'));
 }
 
-toggleInit('togPM');
-toggleInit('togMod', syncFields);
-toggleInit('togWired', syncFields);
-syncFields();
+// ===== Svarene i URL'en, så en beregning kan deles eller gemmes som bogmærke =====
+const NUMS = {r:'inpRelay', d:'inpDim', b:'inpBlu', i:'inp24'};
+const TOGS = {pm:'togPM', w:'togWired', m:'togMod'};
 
-function calc(){
-  const in24  = Math.max(0, parseInt(document.getElementById('inp24').value)  || 0);
-  const blu   = Math.max(0, parseInt(document.getElementById('inpBlu').value) || 0);
-  const relay = Math.max(0, parseInt(document.getElementById('inpRelay').value)|| 0);
-  const dim   = Math.max(0, parseInt(document.getElementById('inpDim').value) || 0);
+function query(){
+  const parts = [];
+  Object.entries(NUMS).forEach(([k,id]) => parts.push(k+'='+numVal(id)));
+  Object.entries(TOGS).forEach(([k,id]) => parts.push(k+'='+(togVal(id)?1:0)));
+  return '?' + parts.join('&');
+}
+
+function applyQuery(){
+  const q = new URLSearchParams(location.search);
+  let found = false;
+  Object.entries(NUMS).forEach(([k,id]) => {
+    if (!q.has(k)) return;
+    document.getElementById(id).value = Math.max(0, parseInt(q.get(k)) || 0);
+    found = true;
+  });
+  Object.entries(TOGS).forEach(([k,id]) => {
+    if (!q.has(k)) return;
+    const want = q.get(k) === '1' ? 'ja' : 'nej';
+    document.querySelectorAll('#'+id+' button').forEach(b => b.classList.toggle('on', b.dataset.v === want));
+    found = true;
+  });
+  return found;
+}
+
+function syncUrl(){
+  // replaceState fejler på file:// – delefunktionen er kun relevant på web.
+  try { history.replaceState(null, '', location.pathname + query()); } catch(e){}
+}
+
+// Rapporten genberegnes løbende, men først efter at den er vist én gang – ellers
+// ville en tom liste møde brugeren med det samme.
+let reportShown = false;
+function onChange(){
+  syncFields();
+  syncUrl();
+  if (reportShown) calc(false);
+}
+
+toggleInit('togPM', onChange);
+toggleInit('togMod', onChange);
+toggleInit('togWired', onChange);
+Object.values(NUMS).forEach(id => document.getElementById(id).addEventListener('input', onChange));
+
+function calc(scroll){
+  const in24  = numVal('inp24');
+  const blu   = numVal('inpBlu');
+  const relay = numVal('inpRelay');
+  const dim   = numVal('inpDim');
   const pm    = togVal('togPM');
   const wired = togVal('togWired');
   const mod2  = wired && togVal('togMod');   // inputmoduler forudsætter fortrådede tryk
@@ -347,12 +392,13 @@ function calc(){
   if (wired && !mod2 && dim>0) notes.push("Lysdæmperne er 230V-enheder og kan ikke styres direkte med 24V. Der er derfor medregnet ét overdragsrelæ pr. dæmperkanal.");
   if (items.some(i => i.key === 'pro3')) notes.push("Shelly Pro 3 er valgt for at holde antallet af enheder nede. Er pladsen i tavlen trang, kan 3 udgange i stedet dækkes af 1× Shelly Pro 2 + 1× Shelly Pro 1, som fylder 2 DIN-moduler mod Pro 3's 3.");
   if (blu>0) notes.push("Batteritrykkene (BLU Wall Switch 4) parres trådløst med Shelly-enhederne – enten direkte via Bluetooth eller gennem scener i Shelly-appen.");
+  if (pm && relay === 0) notes.push("Der er valgt energimåling, men ingen relæudgange. Indstillingen påvirker derfor ikke materialelisten.");
   notes.push("Ved belastning over 5A på en udgang skal der være minimum 10 mm luft omkring enheden for korrekt varmeafledning.");
 
-  render(items, notes, {in24, blu, relay, dim, pm, wired, mod2});
+  render(items, notes, {in24, blu, relay, dim, pm, wired, mod2}, scroll);
 }
 
-function render(items, notes, a){
+function render(items, notes, a, scroll){
   const rep = document.getElementById('report');
   if (items.length === 0){
     rep.style.display = 'block';
@@ -420,11 +466,51 @@ function render(items, notes, a){
 
   rep.style.display = 'block';
   document.getElementById('btnPrint').style.display = 'inline-block';
-  rep.scrollIntoView({behavior:'smooth', block:'start'});
+  // Rul kun ved et bevidst klik – ikke når rapporten opdaterer sig selv undervejs.
+  if (scroll) rep.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
-document.getElementById('btnCalc').addEventListener('click', calc);
+function copyLink(btn){
+  syncUrl();
+  const url = location.href;
+  const done = () => {
+    const t = btn.textContent;
+    btn.textContent = 'Link kopieret!';
+    setTimeout(()=>{ btn.textContent = t; }, 1800);
+  };
+  if (navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(url).then(done, ()=>fallbackCopy(url, done));
+  } else {
+    fallbackCopy(url, done);
+  }
+}
+
+function fallbackCopy(url, done){
+  const ta = document.createElement('textarea');
+  ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); done(); }
+  catch(e){ prompt('Kopiér linket til beregningen:', url); }
+  document.body.removeChild(ta);
+}
+
+document.getElementById('btnCalc').addEventListener('click', ()=>{
+  reportShown = true;
+  document.getElementById('btnShare').style.display = 'inline-block';
+  syncUrl();
+  calc(true);
+});
 document.getElementById('btnPrint').addEventListener('click', ()=>window.print());
+document.getElementById('btnShare').addEventListener('click', e=>copyLink(e.currentTarget));
+
+// Et delt link åbner direkte på den færdige materialeliste.
+const shared = applyQuery();
+syncFields();
+if (shared){
+  reportShown = true;
+  document.getElementById('btnShare').style.display = 'inline-block';
+  calc(false);
+}
 </script>
 </body>
 </html>
