@@ -71,6 +71,7 @@
   .prod .ean{font-size:12.5px; color:var(--grey); font-weight:600; margin-top:2px;}
   .prod .note{font-size:12.5px; color:var(--grey); line-height:1.45; margin-top:6px; max-width:520px;}
   .prod .note .bem{display:block; margin-top:6px; padding-left:9px; border-left:3px solid var(--shellyblue); color:var(--midnight);}
+  .prod .note a{color:var(--navy); font-weight:700; overflow-wrap:anywhere;}
   .qty{background:var(--lime); border-radius:12px; padding:10px 16px; text-align:center; min-width:78px;}
   .qty b{display:block; font-size:24px; font-weight:800; line-height:1;}
   .qty span{font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.8px;}
@@ -143,6 +144,8 @@
     .qty, .tot, .chip, .notes, .guide{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
     .prod{break-inside:avoid;}
     a{text-decoration:none;}
+    /* På papir er linket dødt – skriv adressen ud, så den kan tastes ind. */
+    .prod .note a::after{content:" (" attr(href) ")"; font-weight:400; word-break:break-all;}
   }
 </style>
 </head>
@@ -253,7 +256,8 @@ const PRODUCTS = {
            note:"Trådløst Bluetooth-batteritryk med 4 knapper i dansk LK-design. Parres direkte med Shelly-enheder eller via scener i appen."+
                 "<span class=\"bem\"><b>Bemærk:</b> Batteritrykket skal kommunikere direkte med lysdæmperen/relæet. Rækkevidden kan variere afhængig af vægge, vinduer mm. og er typisk 10-30 meter.</span>"},
   relay24:{name:"Overdragsrelæ / interface-relæ 24V", ean:"– (ikke et Shelly-produkt)", din:null, img:null,
-           note:"Konverterer 24V-tryksignalet til relæets/dæmperens indgang. Kan fx købes hos elsag.dk (interface-/hjælperelæ 24V, 1 omskifter)."}
+           note:"Konverterer 24V-tryksignalet til relæets/dæmperens indgang."+
+                "<span class=\"bem\"><b>Anbefalet:</b> <a href=\"https://www.elsag.dk/interface-hjaelpe-relae-24v-1-omskifter\" target=\"_blank\" rel=\"noopener\">Interface-/hjælperelæ 24V, 1 omskifter, 8A</a> hos elsag.dk.</span>"}
 };
 
 // Relæer uden energimåling. Rækkefølgen bestemmer pakningen: størst først holder
