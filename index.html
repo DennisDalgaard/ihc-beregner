@@ -26,6 +26,8 @@
   /* ===== Form card ===== */
   .card{background:#fff; border-radius:14px; box-shadow:0 6px 24px rgba(18,42,79,.10); padding:28px;}
   .card h2{font-size:15px; font-weight:800; text-transform:uppercase; letter-spacing:1.5px; color:var(--shellyblue); margin-bottom:20px;}
+  .sub{font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:1.2px; color:var(--grey); margin:30px 0 15px; padding-bottom:7px; border-bottom:1px solid var(--line);}
+  .sub:first-of-type{margin-top:0;}
   .qgrid{display:grid; grid-template-columns:1fr 1fr; gap:20px 28px;}
   @media(max-width:640px){.qgrid{grid-template-columns:1fr;}}
   .q label{display:block; font-weight:700; font-size:15px; margin-bottom:4px;}
@@ -49,6 +51,7 @@
   .report-card{background:#fff; border-radius:14px; box-shadow:0 6px 24px rgba(18,42,79,.10); overflow:hidden;}
   .rep-head{background:var(--navy); color:#fff; padding:26px 32px; display:flex; justify-content:space-between; align-items:flex-start; gap:20px; flex-wrap:wrap;}
   .rep-head img{height:30px;}
+  .rep-brand{display:flex; gap:18px; align-items:center; min-width:0;}
   .rep-head .rt h2{font-size:22px; font-weight:800;}
   .rep-head .rt p{font-weight:300; color:var(--sky); font-size:13.5px; margin-top:3px;}
   .rep-date{font-size:12.5px; color:var(--sky); font-weight:500; text-align:right;}
@@ -84,7 +87,7 @@
   .guide{margin-top:22px; display:flex; gap:14px; align-items:center; background:var(--sky); border-radius:12px; padding:16px 20px;}
   .guide .gi{font-size:24px;}
   .guide p{font-size:13px; line-height:1.5;}
-  .guide a{color:var(--navy); font-weight:800; word-break:break-all;}
+  .guide a{color:var(--navy); font-weight:800; overflow-wrap:anywhere;}
 
   .rep-foot{background:#f6fafd; border-top:1px solid var(--line); padding:18px 32px; display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap;}
   .rep-foot .c{font-size:13px; line-height:1.6;}
@@ -93,6 +96,40 @@
   .disclaimer{font-size:11px; color:var(--grey); line-height:1.5; padding:12px 32px 20px; background:#f6fafd;}
 
   .empty{padding:30px; text-align:center; color:var(--grey); font-weight:600;}
+
+  /* ===== Mobil ===== */
+  @media(max-width:640px){
+    .hero{padding:22px 16px 32px;}
+    .hero img{height:28px; margin-bottom:16px;}
+    .hero h1{font-size:23px;}
+    .hero p{font-size:14px;}
+    .wrap{padding:0 12px; margin-bottom:40px;}
+    .card{padding:20px 16px;}
+    .q .hint{min-height:0;}          /* ingen tom plads, når felterne står under hinanden */
+    .actions{margin-top:22px;}
+    .actions .btn{width:100%;}
+
+    .rep-head{padding:20px 16px; gap:14px;}
+    .rep-brand{flex-direction:column; align-items:flex-start; gap:12px;}
+    .rep-head .rt h2{font-size:19px;}
+    .rep-date{text-align:left;}
+    .rep-body{padding:20px 16px;}
+
+    /* Billede + tekst side om side, antal på egen linje under teksten. */
+    .prod{grid-template-columns:60px minmax(0,1fr); gap:10px 14px; padding:16px 0;}
+    .prod img, .prod .noimg{width:60px; height:60px; grid-column:1; grid-row:1;}
+    .prod .noimg{font-size:9.5px; padding:4px; line-height:1.25;}
+    .prod .info{grid-column:2; grid-row:1;}
+    .prod h3{font-size:15.5px;}
+    .prod .qty{grid-column:2; grid-row:2; justify-self:start; min-width:0; padding:6px 14px;}
+    .prod .qty b{display:inline; font-size:19px;}
+    .prod .qty span{margin-left:5px;}
+
+    .tot{flex:1 1 100%;}
+    .guide{padding:14px 16px;}
+    .rep-foot{padding:16px; flex-direction:column; align-items:flex-start;}
+    .disclaimer{padding:12px 16px 18px;}
+  }
 
   /* ===== Print (A4 report) ===== */
   @media print{
@@ -122,50 +159,55 @@
 <main class="wrap">
   <section class="card" aria-label="Spørgsmål">
     <h2>Om installationen</h2>
+    <h3 class="sub">Betjening og funktioner</h3>
     <div class="qgrid">
-      <div class="q" id="q24" hidden>
-        <label for="inp24">1. Antal 24V trykindgange</label>
-        <div class="hint">Tæl <b>indgange</b>, ikke knapper – flere tryk kan deles om samme indgang, når de skal styre samme udgang. Bruges til at dimensionere inputmodulerne.</div>
-        <input type="number" id="inp24" min="0" value="0" inputmode="numeric">
-      </div>
       <div class="q">
-        <label for="inpBlu">2. Antal batteritryk</label>
-        <div class="hint">Hele trådløse tryk med 4 knapper (erstatning for IHC Wireless).</div>
-        <input type="number" id="inpBlu" min="0" value="0" inputmode="numeric">
-      </div>
-      <div class="q">
-        <label for="inpRelay">3. Antal 230V relæudgange</label>
-        <div class="hint">Udgange til lys og andre belastninger, der skal tændes/slukkes.</div>
-        <input type="number" id="inpRelay" min="0" value="0" inputmode="numeric">
-      </div>
-      <div class="q">
-        <label for="inpDim">4. Antal lysdæmper-kanaler</label>
-        <div class="hint">Kanaler der skal kunne dæmpes (erstatter IHC Dimmer).</div>
-        <input type="number" id="inpDim" min="0" value="0" inputmode="numeric">
-      </div>
-      <div class="q">
-        <label>5. Ønskes energimåling i relæerne?</label>
+        <label>Ønskes energimåling i relæerne?</label>
         <div class="hint">Energimåling kræver PM-relæer forsynet med 230V.</div>
         <div class="toggle" id="togPM">
           <button type="button" data-v="nej" class="on">Nej</button>
           <button type="button" data-v="ja">Ja</button>
         </div>
       </div>
+      <div class="q">
+        <label>Ønskes fortrådede tryk?<span class="rec">Anbefaling: Ja</span></label>
+        <div class="hint">Vælg Nej, hvis al betjening sker med batteritryk – så medregnes der hverken overdragsrelæer eller inputmoduler.</div>
+        <div class="toggle" id="togWired">
+          <button type="button" data-v="nej">Nej</button>
+          <button type="button" data-v="ja" class="on">Ja</button>
+        </div>
+      </div>
       <div class="q" id="qMod">
-        <label>6. Ønskes særskilte inputmoduler (Metode 2)?<span class="rec">Anbefaling: Nej</span></label>
+        <label>Ønskes særskilte inputmoduler (Metode 2)?<span class="rec">Anbefaling: Nej</span></label>
         <div class="hint">Vi anbefaler i stedet overdragsrelæer – lidt mere fortrådning, men mindre programmering.</div>
         <div class="toggle" id="togMod">
           <button type="button" data-v="nej" class="on">Nej</button>
           <button type="button" data-v="ja">Ja</button>
         </div>
       </div>
+    </div>
+
+    <h3 class="sub">Antal enheder</h3>
+    <div class="qgrid">
       <div class="q">
-        <label>7. Ønskes fortrådede tryk?<span class="rec">Anbefaling: Ja</span></label>
-        <div class="hint">Vælg Nej, hvis al betjening sker med batteritryk – så medregnes der hverken overdragsrelæer eller inputmoduler.</div>
-        <div class="toggle" id="togWired">
-          <button type="button" data-v="nej">Nej</button>
-          <button type="button" data-v="ja" class="on">Ja</button>
-        </div>
+        <label for="inpRelay">Antal 230V relæudgange</label>
+        <div class="hint">Udgange til lys og andre belastninger, der skal tændes/slukkes.</div>
+        <input type="number" id="inpRelay" min="0" value="0" inputmode="numeric">
+      </div>
+      <div class="q">
+        <label for="inpDim">Antal lysdæmper-kanaler</label>
+        <div class="hint">Kanaler der skal kunne dæmpes (erstatter IHC Dimmer).</div>
+        <input type="number" id="inpDim" min="0" value="0" inputmode="numeric">
+      </div>
+      <div class="q">
+        <label for="inpBlu">Antal batteritryk</label>
+        <div class="hint">Hele trådløse tryk med 4 knapper (erstatning for IHC Wireless).</div>
+        <input type="number" id="inpBlu" min="0" value="0" inputmode="numeric">
+      </div>
+      <div class="q" id="q24" hidden>
+        <label for="inp24">Antal 24V trykindgange</label>
+        <div class="hint">Tæl <b>indgange</b>, ikke knapper – flere tryk kan deles om samme indgang, når de skal styre samme udgang. Bruges til at dimensionere inputmodulerne.</div>
+        <input type="number" id="inp24" min="0" value="0" inputmode="numeric">
       </div>
     </div>
     <div class="actions">
@@ -296,7 +338,7 @@ function calc(){
     notes.push("Der er ikke valgt fortrådede tryk, så al betjening sker med batteritryk eller via appen. Materialelisten indeholder derfor hverken overdragsrelæer eller inputmoduler.");
   } else if (mod2){
     notes.push("Metode 2: Indgangene på Shelly Pro RGBWW PM programmeres til at styre relæer og dæmpere – enten som scener i Shelly-appen eller via Direct Device-to-Device (lokalt WiFi). Der er derfor ikke medregnet overdragsrelæer.");
-    if (in24 === 0) notes.push("Der er ikke angivet nogen 24V trykindgange, så materialelisten indeholder ingen inputmoduler. Udfyld felt 1, hvis der skal fortrådes tryk.");
+    if (in24 === 0) notes.push("Der er ikke angivet nogen 24V trykindgange, så materialelisten indeholder ingen inputmoduler. Angiv antallet under „Antal enheder“, hvis der skal fortrådes tryk.");
   } else if (pm){
     notes.push("Energimåling kræver, at relæerne forsynes med 230V. Hver relæudgang med fortrådet tryk styres derfor via et overdragsrelæ – lidt mere fortrådning, men minimal programmering.");
   } else {
@@ -332,7 +374,7 @@ function render(items, notes, a){
       ? '<img src="'+p.img+'" alt="'+p.name+'">'
       : '<div class="noimg">Se leverandør<br>(fx elsag.dk)</div>';
     return '<div class="prod">'+img+
-      '<div><h3>'+p.name+'</h3><div class="ean">EAN: '+p.ean+'</div><div class="note">'+p.note+'</div></div>'+
+      '<div class="info"><h3>'+p.name+'</h3><div class="ean">EAN: '+p.ean+'</div><div class="note">'+p.note+'</div></div>'+
       '<div class="qty"><b>'+i.qty+'</b><span>stk.</span></div></div>';
   }).join('');
 
@@ -350,7 +392,7 @@ function render(items, notes, a){
   rep.innerHTML =
   '<div class="report-card">'+
     '<div class="rep-head">'+
-      '<div style="display:flex; gap:18px; align-items:center;">'+
+      '<div class="rep-brand">'+
         '<img src="'+LOGO_WHITE+'" alt="Shelly">'+
         '<div class="rt"><h2>IHC til Shelly – Konverteringsforslag</h2>'+
         '<p>Materialeliste udarbejdet ud fra oplysninger om installationen</p></div>'+
