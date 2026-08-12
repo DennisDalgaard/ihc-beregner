@@ -26,6 +26,8 @@
   /* ===== Form card ===== */
   .card{background:#fff; border-radius:14px; box-shadow:0 6px 24px rgba(18,42,79,.10); padding:28px;}
   .card h2{font-size:15px; font-weight:800; text-transform:uppercase; letter-spacing:1.5px; color:var(--shellyblue); margin-bottom:20px;}
+  .sub{font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:1.2px; color:var(--grey); margin:30px 0 15px; padding-bottom:7px; border-bottom:1px solid var(--line);}
+  .sub:first-of-type{margin-top:0;}
   .qgrid{display:grid; grid-template-columns:1fr 1fr; gap:20px 28px;}
   @media(max-width:640px){.qgrid{grid-template-columns:1fr;}}
   .q label{display:block; font-weight:700; font-size:15px; margin-bottom:4px;}
@@ -49,6 +51,7 @@
   .report-card{background:#fff; border-radius:14px; box-shadow:0 6px 24px rgba(18,42,79,.10); overflow:hidden;}
   .rep-head{background:var(--navy); color:#fff; padding:26px 32px; display:flex; justify-content:space-between; align-items:flex-start; gap:20px; flex-wrap:wrap;}
   .rep-head img{height:30px;}
+  .rep-brand{display:flex; gap:18px; align-items:center; min-width:0;}
   .rep-head .rt h2{font-size:22px; font-weight:800;}
   .rep-head .rt p{font-weight:300; color:var(--sky); font-size:13.5px; margin-top:3px;}
   .rep-date{font-size:12.5px; color:var(--sky); font-weight:500; text-align:right;}
@@ -64,9 +67,12 @@
   .prod:last-child{border-bottom:none;}
   .prod img{width:92px; height:92px; object-fit:contain; border:1px solid var(--line); border-radius:10px; background:#fff;}
   .prod .noimg{width:92px; height:92px; border:1px dashed var(--line); border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--grey); font-size:11px; text-align:center; padding:6px;}
+  .prod .noimg.brand{border-style:solid; background:#f6fafd url("img/asset10.png") center/62% no-repeat;}
   .prod h3{font-size:16.5px; font-weight:800;}
   .prod .ean{font-size:12.5px; color:var(--grey); font-weight:600; margin-top:2px;}
   .prod .note{font-size:12.5px; color:var(--grey); line-height:1.45; margin-top:6px; max-width:520px;}
+  .prod .note .bem{display:block; margin-top:6px; padding-left:9px; border-left:3px solid var(--shellyblue); color:var(--midnight);}
+  .prod .note a{color:var(--navy); font-weight:700; overflow-wrap:anywhere;}
   .qty{background:var(--lime); border-radius:12px; padding:10px 16px; text-align:center; min-width:78px;}
   .qty b{display:block; font-size:24px; font-weight:800; line-height:1;}
   .qty span{font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.8px;}
@@ -83,7 +89,7 @@
   .guide{margin-top:22px; display:flex; gap:14px; align-items:center; background:var(--sky); border-radius:12px; padding:16px 20px;}
   .guide .gi{font-size:24px;}
   .guide p{font-size:13px; line-height:1.5;}
-  .guide a{color:var(--navy); font-weight:800; word-break:break-all;}
+  .guide a{color:var(--navy); font-weight:800; overflow-wrap:anywhere;}
 
   .rep-foot{background:#f6fafd; border-top:1px solid var(--line); padding:18px 32px; display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap;}
   .rep-foot .c{font-size:13px; line-height:1.6;}
@@ -92,6 +98,40 @@
   .disclaimer{font-size:11px; color:var(--grey); line-height:1.5; padding:12px 32px 20px; background:#f6fafd;}
 
   .empty{padding:30px; text-align:center; color:var(--grey); font-weight:600;}
+
+  /* ===== Mobil ===== */
+  @media(max-width:640px){
+    .hero{padding:22px 16px 32px;}
+    .hero img{height:28px; margin-bottom:16px;}
+    .hero h1{font-size:23px;}
+    .hero p{font-size:14px;}
+    .wrap{padding:0 12px; margin-bottom:40px;}
+    .card{padding:20px 16px;}
+    .q .hint{min-height:0;}          /* ingen tom plads, når felterne står under hinanden */
+    .actions{margin-top:22px;}
+    .actions .btn{width:100%;}
+
+    .rep-head{padding:20px 16px; gap:14px;}
+    .rep-brand{flex-direction:column; align-items:flex-start; gap:12px;}
+    .rep-head .rt h2{font-size:19px;}
+    .rep-date{text-align:left;}
+    .rep-body{padding:20px 16px;}
+
+    /* Billede + tekst side om side, antal på egen linje under teksten. */
+    .prod{grid-template-columns:60px minmax(0,1fr); gap:10px 14px; padding:16px 0;}
+    .prod img, .prod .noimg{width:60px; height:60px; grid-column:1; grid-row:1;}
+    .prod .noimg{font-size:9.5px; padding:4px; line-height:1.25;}
+    .prod .info{grid-column:2; grid-row:1;}
+    .prod h3{font-size:15.5px;}
+    .prod .qty{grid-column:2; grid-row:2; justify-self:start; min-width:0; padding:6px 14px;}
+    .prod .qty b{display:inline; font-size:19px;}
+    .prod .qty span{margin-left:5px;}
+
+    .tot{flex:1 1 100%;}
+    .guide{padding:14px 16px;}
+    .rep-foot{padding:16px; flex-direction:column; align-items:flex-start;}
+    .disclaimer{padding:12px 16px 18px;}
+  }
 
   /* ===== Print (A4 report) ===== */
   @media print{
@@ -102,9 +142,11 @@
     #report{display:block !important; margin:0;}
     .report-card{box-shadow:none; border-radius:0;}
     .rep-head{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
-    .qty, .tot, .chip, .notes, .guide{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
+    .qty, .tot, .chip, .notes, .guide, .prod .noimg.brand{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
     .prod{break-inside:avoid;}
     a{text-decoration:none;}
+    /* På papir er linket dødt – skriv adressen ud, så den kan tastes ind. */
+    .prod .note a::after{content:" (" attr(href) ")"; font-weight:400; word-break:break-all;}
   }
 </style>
 </head>
@@ -121,29 +163,10 @@
 <main class="wrap">
   <section class="card" aria-label="Spørgsmål">
     <h2>Om installationen</h2>
+    <h3 class="sub">Betjening og funktioner</h3>
     <div class="qgrid">
       <div class="q">
-        <label for="inp24">1. Antal 24V trykindgange</label>
-        <div class="hint">Tæl <b>indgange</b>, ikke knapper – flere tryk kan deles om samme indgang, når de skal styre samme udgang.</div>
-        <input type="number" id="inp24" min="0" value="0" inputmode="numeric">
-      </div>
-      <div class="q">
-        <label for="inpBlu">2. Antal batteritryk</label>
-        <div class="hint">Hele trådløse tryk med 4 knapper (erstatning for IHC Wireless).</div>
-        <input type="number" id="inpBlu" min="0" value="0" inputmode="numeric">
-      </div>
-      <div class="q">
-        <label for="inpRelay">3. Antal 230V relæudgange</label>
-        <div class="hint">Udgange til lys og andre belastninger, der skal tændes/slukkes.</div>
-        <input type="number" id="inpRelay" min="0" value="0" inputmode="numeric">
-      </div>
-      <div class="q">
-        <label for="inpDim">4. Antal lysdæmper-kanaler</label>
-        <div class="hint">Kanaler der skal kunne dæmpes (erstatter IHC Dimmer).</div>
-        <input type="number" id="inpDim" min="0" value="0" inputmode="numeric">
-      </div>
-      <div class="q">
-        <label>5. Ønskes energimåling i relæerne?</label>
+        <label>Ønskes energimåling i relæerne?</label>
         <div class="hint">Energimåling kræver PM-relæer forsynet med 230V.</div>
         <div class="toggle" id="togPM">
           <button type="button" data-v="nej" class="on">Nej</button>
@@ -151,7 +174,15 @@
         </div>
       </div>
       <div class="q">
-        <label>6. Ønskes særskilte inputmoduler (Metode 2)?<span class="rec">Anbefaling: Nej</span></label>
+        <label>Ønskes fortrådede tryk?<span class="rec">Anbefaling: Ja</span></label>
+        <div class="hint">Vælg Nej, hvis al betjening sker med batteritryk – så medregnes der hverken overdragsrelæer eller inputmoduler.</div>
+        <div class="toggle" id="togWired">
+          <button type="button" data-v="nej">Nej</button>
+          <button type="button" data-v="ja" class="on">Ja</button>
+        </div>
+      </div>
+      <div class="q" id="qMod">
+        <label>Ønskes særskilte inputmoduler (Metode 2)?<span class="rec">Anbefaling: Nej</span></label>
         <div class="hint">Vi anbefaler i stedet overdragsrelæer – lidt mere fortrådning, men mindre programmering.</div>
         <div class="toggle" id="togMod">
           <button type="button" data-v="nej" class="on">Nej</button>
@@ -159,9 +190,34 @@
         </div>
       </div>
     </div>
+
+    <h3 class="sub">Antal enheder</h3>
+    <div class="qgrid">
+      <div class="q">
+        <label for="inpRelay">Antal 230V relæudgange</label>
+        <div class="hint">Udgange til lys og andre belastninger, der skal tændes/slukkes.</div>
+        <input type="number" id="inpRelay" min="0" value="0" inputmode="numeric">
+      </div>
+      <div class="q">
+        <label for="inpDim">Antal lysdæmper-kanaler</label>
+        <div class="hint">Kanaler der skal kunne dæmpes (erstatter IHC Dimmer).</div>
+        <input type="number" id="inpDim" min="0" value="0" inputmode="numeric">
+      </div>
+      <div class="q">
+        <label for="inpBlu">Antal batteritryk</label>
+        <div class="hint">Hele trådløse tryk med 4 knapper (erstatning for IHC Wireless).</div>
+        <input type="number" id="inpBlu" min="0" value="0" inputmode="numeric">
+      </div>
+      <div class="q" id="q24" hidden>
+        <label for="inp24">Antal 24V trykindgange</label>
+        <div class="hint">Tæl <b>indgange</b>, ikke knapper – flere tryk kan deles om samme indgang, når de skal styre samme udgang. Bruges til at dimensionere inputmodulerne.</div>
+        <input type="number" id="inp24" min="0" value="0" inputmode="numeric">
+      </div>
+    </div>
     <div class="actions">
       <button class="btn btn-primary" id="btnCalc">Beregn materialeliste</button>
       <button class="btn btn-ghost" id="btnPrint">Gem / print som PDF</button>
+      <button class="btn btn-ghost" id="btnShare">Kopiér link til beregningen</button>
     </div>
   </section>
 
@@ -177,7 +233,9 @@ const IMG = {
   dim1pm: "img/asset5.jpg",
   dim2pm: "img/asset6.jpg",
   rgbww: "img/asset7.jpg",
-  blu4: "img/asset8.jpg"
+  blu4: "img/asset8.jpg",
+  pro1pm: "img/asset11.jpg",
+  pro2pm: "img/asset12.jpg"
 };
 const LOGO_WHITE = "img/asset9.png";
 const LOGO_BLUE = "img/asset10.png";
@@ -187,8 +245,14 @@ const PRODUCTS = {
            note:"Relæ med 1 udgang og 2 indgange. Forsynes med 24V DC, så svagstrømstryk kobles direkte på indgangen."},
   pro2:   {name:"Shelly Pro 2", ean:"3800235268025", din:1, img:IMG.pro2,
            note:"Relæ med 2 udgange og 2 indgange. Forsynes med 24V DC, så svagstrømstryk kobles direkte på indgangene. Fylder kun 1 modul i tavlen."},
+  pro3:   {name:"Shelly Pro 3", ean:"3800235268094", din:3, img:IMG.pro3,
+           note:"Relæ med 3 potentialfrie udgange og 3 indgange. Forsynes med 24V DC, så svagstrømstryk kobles direkte på indgangene. Har ikke energimåling."},
   pro4pm: {name:"Shelly Pro 4PM", ean:"3800235268049", din:3, img:IMG.pro4pm,
            note:"4-kanals relæ med energimåling pr. kanal og display. Forsynes med 230V – 24V tryk tilsluttes via overdragsrelæ."},
+  pro2pm: {name:"Shelly Pro 2PM", ean:"3800235268032", din:1, img:IMG.pro2pm,
+           note:"2-kanals relæ med energimåling pr. kanal. Forsynes med 230V – 24V tryk tilsluttes via overdragsrelæ. Fylder kun 1 modul i tavlen."},
+  pro1pm: {name:"Shelly Pro 1PM", ean:"3800235268018", din:1, img:IMG.pro1pm,
+           note:"1-kanals relæ med energimåling. Forsynes med 230V – 24V tryk tilsluttes via overdragsrelæ. Fylder kun 1 modul i tavlen."},
   dim2pm: {name:"Shelly Pro Dimmer 2PM", ean:"3800235268179", din:1, img:IMG.dim2pm,
            note:"2-kanals lysdæmper med energimåling. 230V-enhed – ved fortrådet trykstyring anvendes overdragsrelæ pr. kanal."},
   dim1pm: {name:"Shelly Pro Dimmer 1PM", ean:"3800235268162", din:1, img:IMG.dim1pm,
@@ -196,79 +260,163 @@ const PRODUCTS = {
   rgbww:  {name:"Shelly Pro RGBWW PM", ean:"3800235268216", din:1, img:IMG.rgbww,
            note:"Anvendes som 5-kanals 24V inputmodul til DIN-skinne. Indgangene styrer relæer og dæmpere trådløst og understøtter kort, dobbelt, tredobbelt og langt tryk."},
   blu4:   {name:"Shelly BLU Wall Switch 4 ZB DK White", ean:"3800238073404", din:0, img:IMG.blu4,
-           note:"Trådløst Bluetooth-batteritryk med 4 knapper i dansk LK-design. Parres direkte med Shelly-enheder eller via scener i appen."},
+           note:"Trådløst Bluetooth-batteritryk med 4 knapper i dansk LK-design. Parres direkte med Shelly-enheder eller via scener i appen."+
+                "<span class=\"bem\"><b>Bemærk:</b> Batteritrykket skal kommunikere direkte med lysdæmperen/relæet. Rækkevidden kan variere afhængig af vægge, vinduer mm. og er typisk 10-30 meter.</span>"},
   relay24:{name:"Overdragsrelæ / interface-relæ 24V", ean:"– (ikke et Shelly-produkt)", din:null, img:null,
-           note:"Konverterer 24V-tryksignalet til relæets/dæmperens indgang. Kan fx købes hos elsag.dk (interface-/hjælperelæ 24V, 1 omskifter)."}
+           noimg:"Se leverandør<br>(fx elsag.dk)",
+           note:"Konverterer 24V-tryksignalet til relæets/dæmperens indgang."+
+                "<span class=\"bem\"><b>Anbefalet:</b> <a href=\"https://www.elsag.dk/interface-hjaelpe-relae-24v-1-omskifter\" target=\"_blank\" rel=\"noopener\">Interface-/hjælperelæ 24V, 1 omskifter, 8A</a> hos elsag.dk.</span>"}
 };
 
-function toggleInit(id){
+// Relæ-lineups, størst først. Rækkefølgen bestemmer pakningen: den holder antallet
+// af enheder nede og undgår at betale for kanaler, der ikke bruges – 5 udgange med
+// energimåling bliver fx 1× Pro 4PM + 1× Pro 1PM frem for 2× Pro 4PM. Flyttes en
+// smallere enhed frem, prioriteres i stedet færrest DIN-moduler (Pro 2 og Pro 2PM
+// giver 2 kanaler pr. modul, mens Pro 3 og Pro 4PM giver færre).
+const RELAY_LINEUP = [
+  {key:'pro3', ch:3},
+  {key:'pro2', ch:2},
+  {key:'pro1', ch:1}
+];
+const PM_LINEUP = [
+  {key:'pro4pm', ch:4},
+  {key:'pro2pm', ch:2},
+  {key:'pro1pm', ch:1}
+];
+
+function addRelays(lineup, n, add){
+  let left = n;
+  lineup.forEach((r, i) => {
+    // Den mindste enhed dækker resten; de øvrige tager kun hele multipla.
+    const qty = (i === lineup.length-1) ? Math.ceil(left/r.ch) : Math.floor(left/r.ch);
+    if (qty > 0){ add(r.key, qty); left = Math.max(0, left - qty*r.ch); }
+  });
+}
+
+function toggleInit(id, onChange){
   const t = document.getElementById(id);
   t.querySelectorAll('button').forEach(b=>{
     b.addEventListener('click', ()=>{
       t.querySelectorAll('button').forEach(x=>x.classList.remove('on'));
       b.classList.add('on');
+      if (onChange) onChange();
     });
   });
 }
-toggleInit('togPM'); toggleInit('togMod');
 const togVal = id => document.querySelector('#'+id+' button.on').dataset.v === 'ja';
+const numVal = id => Math.max(0, parseInt(document.getElementById(id).value) || 0);
 
-function calc(){
-  const in24  = Math.max(0, parseInt(document.getElementById('inp24').value)  || 0);
-  const blu   = Math.max(0, parseInt(document.getElementById('inpBlu').value) || 0);
-  const relay = Math.max(0, parseInt(document.getElementById('inpRelay').value)|| 0);
-  const dim   = Math.max(0, parseInt(document.getElementById('inpDim').value) || 0);
+// Uden fortrådede tryk er der intet at føre ind i et inputmodul, og antallet af
+// 24V trykindgange bruges kun til at dimensionere inputmodulerne i Metode 2. Uden
+// inputmoduler er trykkene fortrådet direkte på relæets/dæmperens indgang, og
+// antallet af enheder følger alene relæ- og dæmperkanalerne. Begge felter ligger
+// sidst i hver sektion, så et klik aldrig flytter noget over det man klikkede på.
+function syncFields(){
+  const wired = togVal('togWired');
+  document.getElementById('qMod').hidden = !wired;
+  document.getElementById('q24').hidden  = !(wired && togVal('togMod'));
+}
+
+// ===== Svarene i URL'en, så en beregning kan deles eller gemmes som bogmærke =====
+const NUMS = {r:'inpRelay', d:'inpDim', b:'inpBlu', i:'inp24'};
+const TOGS = {pm:'togPM', w:'togWired', m:'togMod'};
+
+function query(){
+  const parts = [];
+  Object.entries(NUMS).forEach(([k,id]) => parts.push(k+'='+numVal(id)));
+  Object.entries(TOGS).forEach(([k,id]) => parts.push(k+'='+(togVal(id)?1:0)));
+  return '?' + parts.join('&');
+}
+
+function applyQuery(){
+  const q = new URLSearchParams(location.search);
+  let found = false;
+  Object.entries(NUMS).forEach(([k,id]) => {
+    if (!q.has(k)) return;
+    document.getElementById(id).value = Math.max(0, parseInt(q.get(k)) || 0);
+    found = true;
+  });
+  Object.entries(TOGS).forEach(([k,id]) => {
+    if (!q.has(k)) return;
+    const want = q.get(k) === '1' ? 'ja' : 'nej';
+    document.querySelectorAll('#'+id+' button').forEach(b => b.classList.toggle('on', b.dataset.v === want));
+    found = true;
+  });
+  return found;
+}
+
+function syncUrl(){
+  // replaceState fejler på file:// – delefunktionen er kun relevant på web.
+  try { history.replaceState(null, '', location.pathname + query()); } catch(e){}
+}
+
+// Rapporten genberegnes løbende, men først efter at den er vist én gang – ellers
+// ville en tom liste møde brugeren med det samme.
+let reportShown = false;
+function onChange(){
+  syncFields();
+  syncUrl();
+  if (reportShown) calc(false);
+}
+
+toggleInit('togPM', onChange);
+toggleInit('togMod', onChange);
+toggleInit('togWired', onChange);
+Object.values(NUMS).forEach(id => document.getElementById(id).addEventListener('input', onChange));
+
+function calc(scroll){
+  const in24  = numVal('inp24');
+  const blu   = numVal('inpBlu');
+  const relay = numVal('inpRelay');
+  const dim   = numVal('inpDim');
   const pm    = togVal('togPM');
-  const mod2  = togVal('togMod');
+  const wired = togVal('togWired');
+  const mod2  = wired && togVal('togMod');   // inputmoduler forudsætter fortrådede tryk
 
   const items = [];      // {key, qty}
   const notes = [];
   const add = (key, qty) => { if(qty>0) items.push({key, qty}); };
 
+  // --- Relæer: antallet følger alene de ønskede relæudgange ---
+  addRelays(pm ? PM_LINEUP : RELAY_LINEUP, relay, add);
+
   // --- Lysdæmpere ---
   add('dim2pm', Math.floor(dim/2));
   add('dim1pm', dim % 2);
 
-  let relay24 = 0; // overdragsrelæer
+  // --- Inputmoduler (Metode 2) ---
+  if (mod2) add('rgbww', Math.ceil(in24/5));
 
-  if (mod2){
-    // Metode 2: særskilte inputmoduler – alle 24V indgange samles i Pro RGBWW PM
-    add('rgbww', Math.ceil(in24/5));
-    if (pm){
-      add('pro4pm', Math.ceil(relay/4));
-    } else {
-      add('pro2', Math.ceil(relay/2));
-    }
-    if (in24>0) notes.push("Metode 2: Indgangene på Shelly Pro RGBWW PM programmeres til at styre relæer og dæmpere – enten som scener i Shelly-appen eller via Direct Device-to-Device (lokalt WiFi).");
-    if (dim>0) notes.push("Lysdæmperne styres trådløst fra inputmodulet – der kræves ingen overdragsrelæer.");
-  } else if (pm){
-    // Energimåling: Pro 4PM + overdragsrelæ pr. 24V trykindgang (relæer og dæmpere)
-    add('pro4pm', Math.ceil(relay/4));
-    relay24 = in24;
-    if (in24>0) notes.push("Energimåling kræver 230V-forsyning af relæerne. Alle 24V trykindgange tilsluttes derfor via overdragsrelæer – lidt mere fortrådning, men minimal programmering.");
-  } else {
-    // Metode 1: kiprelæ – Pro 2 forsynes 24V, tryk direkte på indgangene
-    const dimInputs = Math.min(in24, dim);        // dæmper-indgange kræver overdragsrelæ
-    const relayInputs = in24 - dimInputs;
-    const need = Math.max(relayInputs, relay);
-    if (need > 0){
-      if (need % 2 === 1){ add('pro2', Math.floor(need/2)); add('pro1', 1); }
-      else { add('pro2', need/2); }
-    }
-    relay24 = dimInputs;
-    notes.push("Metode 1 (kiprelæ): Relæerne forsynes med 24V DC, og trykkene kobles direkte på indgangene. Basale tænd/sluk-funktioner virker altid – også uden WiFi og internet.");
-    if (dimInputs>0) notes.push("Lysdæmperne er 230V-enheder og kan ikke styres direkte med 24V. Der er derfor medregnet ét overdragsrelæ pr. dæmperkanal med fortrådet tryk.");
-  }
+  // --- Overdragsrelæer ---
+  // Lysdæmpere og PM-relæer er 230V-enheder og kan ikke tage 24V-tryksignalet
+  // direkte, så de får ét overdragsrelæ pr. kanal. I Metode 2 går alle tryk i
+  // inputmodulet og styringen sker trådløst – der er derfor ingen overdragsrelæer,
+  // og uden fortrådede tryk er der intet 24V-signal at konvertere.
+  add('relay24', (mod2 || !wired) ? 0 : dim + (pm ? relay : 0));
 
-  add('relay24', relay24);
   add('blu4', blu);
+
+  // --- Bemærkninger ---
+  if (!wired){
+    notes.push("Der er ikke valgt fortrådede tryk, så al betjening sker med batteritryk eller via appen. Materialelisten indeholder derfor hverken overdragsrelæer eller inputmoduler.");
+  } else if (mod2){
+    notes.push("Metode 2: Indgangene på Shelly Pro RGBWW PM programmeres til at styre relæer og dæmpere – enten som scener i Shelly-appen eller via Direct Device-to-Device (lokalt WiFi). Der er derfor ikke medregnet overdragsrelæer.");
+    if (in24 === 0) notes.push("Der er ikke angivet nogen 24V trykindgange, så materialelisten indeholder ingen inputmoduler. Angiv antallet under „Antal enheder“, hvis der skal fortrådes tryk.");
+  } else if (pm){
+    notes.push("Energimåling kræver, at relæerne forsynes med 230V. Hver relæudgang med fortrådet tryk styres derfor via et overdragsrelæ – lidt mere fortrådning, men minimal programmering.");
+  } else {
+    notes.push("Metode 1 (kiprelæ): Relæerne forsynes med 24V DC, og trykkene kobles direkte på indgangene. Basale tænd/sluk-funktioner virker altid – også uden WiFi og internet.");
+  }
+  if (wired && !mod2 && dim>0) notes.push("Lysdæmperne er 230V-enheder og kan ikke styres direkte med 24V. Der er derfor medregnet ét overdragsrelæ pr. dæmperkanal.");
+  if (items.some(i => i.key === 'pro3')) notes.push("Shelly Pro 3 er valgt for at holde antallet af enheder nede. Er pladsen i tavlen trang, kan 3 udgange i stedet dækkes af 1× Shelly Pro 2 + 1× Shelly Pro 1, som fylder 2 DIN-moduler mod Pro 3's 3.");
   if (blu>0) notes.push("Batteritrykkene (BLU Wall Switch 4) parres trådløst med Shelly-enhederne – enten direkte via Bluetooth eller gennem scener i Shelly-appen.");
+  if (pm && relay === 0) notes.push("Der er valgt energimåling, men ingen relæudgange. Indstillingen påvirker derfor ikke materialelisten.");
   notes.push("Ved belastning over 5A på en udgang skal der være minimum 10 mm luft omkring enheden for korrekt varmeafledning.");
 
-  render(items, notes, {in24, blu, relay, dim, pm, mod2});
+  render(items, notes, {in24, blu, relay, dim, pm, wired, mod2}, scroll);
 }
 
-function render(items, notes, a){
+function render(items, notes, a, scroll){
   const rep = document.getElementById('report');
   if (items.length === 0){
     rep.style.display = 'block';
@@ -286,27 +434,31 @@ function render(items, notes, a){
 
   const rows = items.map(i => {
     const p = PRODUCTS[i.key];
-    const img = p.img
-      ? '<img src="'+p.img+'" alt="'+p.name+'">'
-      : '<div class="noimg">Se leverandør<br>(fx elsag.dk)</div>';
+    // Uden produktfoto: leverandørhenvisning hvis produktet har en, ellers
+    // Shelly-mærket, så rækken ikke ser ud som om noget mangler.
+    const img = p.img ? '<img src="'+p.img+'" alt="'+p.name+'">'
+      : p.noimg ? '<div class="noimg">'+p.noimg+'</div>'
+      : '<div class="noimg brand" role="img" aria-label="Shelly"></div>';
     return '<div class="prod">'+img+
-      '<div><h3>'+p.name+'</h3><div class="ean">EAN: '+p.ean+'</div><div class="note">'+p.note+'</div></div>'+
+      '<div class="info"><h3>'+p.name+'</h3><div class="ean">EAN: '+p.ean+'</div><div class="note">'+p.note+'</div></div>'+
       '<div class="qty"><b>'+i.qty+'</b><span>stk.</span></div></div>';
   }).join('');
 
   const chips = [
-    '<span class="chip">24V trykindgange: <b>'+a.in24+'</b></span>',
+    // 24V trykindgange indgår kun i beregningen, når der bruges inputmoduler.
+    a.mod2 ? '<span class="chip">24V trykindgange: <b>'+a.in24+'</b></span>' : '',
     '<span class="chip">Batteritryk: <b>'+a.blu+'</b></span>',
     '<span class="chip">230V relæudgange: <b>'+a.relay+'</b></span>',
     '<span class="chip">Lysdæmper-kanaler: <b>'+a.dim+'</b></span>',
     '<span class="chip">Energimåling: <b>'+(a.pm?'Ja':'Nej')+'</b></span>',
-    '<span class="chip">Særskilte inputmoduler: <b>'+(a.mod2?'Ja (Metode 2)':'Nej')+'</b></span>'
-  ].join('');
+    '<span class="chip">Fortrådede tryk: <b>'+(a.wired?'Ja':'Nej')+'</b></span>',
+    a.wired ? '<span class="chip">Særskilte inputmoduler: <b>'+(a.mod2?'Ja (Metode 2)':'Nej')+'</b></span>' : ''
+  ].filter(Boolean).join('');
 
   rep.innerHTML =
   '<div class="report-card">'+
     '<div class="rep-head">'+
-      '<div style="display:flex; gap:18px; align-items:center;">'+
+      '<div class="rep-brand">'+
         '<img src="'+LOGO_WHITE+'" alt="Shelly">'+
         '<div class="rt"><h2>IHC til Shelly – Konverteringsforslag</h2>'+
         '<p>Materialeliste udarbejdet ud fra oplysninger om installationen</p></div>'+
@@ -334,11 +486,51 @@ function render(items, notes, a){
 
   rep.style.display = 'block';
   document.getElementById('btnPrint').style.display = 'inline-block';
-  rep.scrollIntoView({behavior:'smooth', block:'start'});
+  // Rul kun ved et bevidst klik – ikke når rapporten opdaterer sig selv undervejs.
+  if (scroll) rep.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
-document.getElementById('btnCalc').addEventListener('click', calc);
+function copyLink(btn){
+  syncUrl();
+  const url = location.href;
+  const done = () => {
+    const t = btn.textContent;
+    btn.textContent = 'Link kopieret!';
+    setTimeout(()=>{ btn.textContent = t; }, 1800);
+  };
+  if (navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(url).then(done, ()=>fallbackCopy(url, done));
+  } else {
+    fallbackCopy(url, done);
+  }
+}
+
+function fallbackCopy(url, done){
+  const ta = document.createElement('textarea');
+  ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); done(); }
+  catch(e){ prompt('Kopiér linket til beregningen:', url); }
+  document.body.removeChild(ta);
+}
+
+document.getElementById('btnCalc').addEventListener('click', ()=>{
+  reportShown = true;
+  document.getElementById('btnShare').style.display = 'inline-block';
+  syncUrl();
+  calc(true);
+});
 document.getElementById('btnPrint').addEventListener('click', ()=>window.print());
+document.getElementById('btnShare').addEventListener('click', e=>copyLink(e.currentTarget));
+
+// Et delt link åbner direkte på den færdige materialeliste.
+const shared = applyQuery();
+syncFields();
+if (shared){
+  reportShown = true;
+  document.getElementById('btnShare').style.display = 'inline-block';
+  calc(false);
+}
 </script>
 </body>
 </html>
