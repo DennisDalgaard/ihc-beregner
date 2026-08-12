@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IHC til Shelly konvertering – Materialeberegner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#003C82; --midnight:#122A4F; --shellyblue:#4594d1;
+    --sky:#AAE1FA; --lime:#C8FF78; --grey:#5b6b7d; --line:#dbe6ef;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Manrope', Arial, sans-serif; background:#f2f7fb; color:var(--midnight);}
+
+  /* ===== Screen header ===== */
+  .hero{background:linear-gradient(135deg, var(--navy) 0%, var(--midnight) 100%); color:#fff; padding:34px 20px 40px;}
+  .hero-inner{max-width:960px; margin:0 auto;}
+  .hero img{height:34px; display:block; margin-bottom:22px;}
+  .hero h1{font-size:30px; font-weight:800; letter-spacing:-0.5px;}
+  .hero p{margin-top:8px; font-weight:300; color:var(--sky); max-width:640px; line-height:1.5;}
+
+  .wrap{max-width:960px; margin:-18px auto 60px; padding:0 20px;}
+
+  /* ===== Form card ===== */
+  .card{background:#fff; border-radius:14px; box-shadow:0 6px 24px rgba(18,42,79,.10); padding:28px;}
+  .card h2{font-size:15px; font-weight:800; text-transform:uppercase; letter-spacing:1.5px; color:var(--shellyblue); margin-bottom:20px;}
+  .qgrid{display:grid; grid-template-columns:1fr 1fr; gap:20px 28px;}
+  @media(max-width:640px){.qgrid{grid-template-columns:1fr;}}
+  .q label{display:block; font-weight:700; font-size:15px; margin-bottom:4px;}
+  .q .hint{font-size:12.5px; color:var(--grey); line-height:1.4; margin-bottom:8px; min-height:34px;}
+  .q input[type=number]{width:100%; padding:11px 13px; border:1.5px solid var(--line); border-radius:9px; font:inherit; font-size:16px; font-weight:600;}
+  .q input[type=number]:focus{outline:2px solid var(--shellyblue); border-color:var(--shellyblue);}
+  .toggle{display:flex; gap:8px;}
+  .toggle button{flex:1; padding:10px; border:1.5px solid var(--line); background:#fff; border-radius:9px; font:inherit; font-weight:700; cursor:pointer; color:var(--grey);}
+  .toggle button.on{background:var(--navy); border-color:var(--navy); color:#fff;}
+  .toggle button:focus-visible{outline:2px solid var(--shellyblue); outline-offset:2px;}
+  .rec{display:inline-block; background:var(--lime); color:var(--midnight); font-size:11px; font-weight:800; padding:2px 8px; border-radius:20px; margin-left:6px; vertical-align:middle;}
+  .actions{margin-top:26px; display:flex; gap:12px; flex-wrap:wrap;}
+  .btn{border:none; border-radius:10px; padding:14px 26px; font:inherit; font-weight:800; font-size:15px; cursor:pointer;}
+  .btn-primary{background:var(--shellyblue); color:#fff;}
+  .btn-primary:hover{background:#3a80b6;}
+  .btn-ghost{background:#fff; color:var(--navy); border:1.5px solid var(--navy); display:none;}
+  .btn-ghost:hover{background:var(--sky);}
+
+  /* ===== Report ===== */
+  #report{display:none; margin-top:26px;}
+  .report-card{background:#fff; border-radius:14px; box-shadow:0 6px 24px rgba(18,42,79,.10); overflow:hidden;}
+  .rep-head{background:var(--navy); color:#fff; padding:26px 32px; display:flex; justify-content:space-between; align-items:flex-start; gap:20px; flex-wrap:wrap;}
+  .rep-head img{height:30px;}
+  .rep-head .rt h2{font-size:22px; font-weight:800;}
+  .rep-head .rt p{font-weight:300; color:var(--sky); font-size:13.5px; margin-top:3px;}
+  .rep-date{font-size:12.5px; color:var(--sky); font-weight:500; text-align:right;}
+
+  .rep-body{padding:28px 32px;}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:24px;}
+  .chip{background:#eef6fc; border:1px solid var(--line); color:var(--midnight); font-size:12.5px; font-weight:600; padding:6px 12px; border-radius:20px;}
+  .chip b{color:var(--navy);}
+
+  .sec-label{font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:1.5px; color:var(--shellyblue); margin:22px 0 12px; border-bottom:2px solid var(--sky); padding-bottom:6px;}
+
+  .prod{display:grid; grid-template-columns:92px 1fr auto; gap:18px; align-items:center; padding:14px 0; border-bottom:1px solid var(--line);}
+  .prod:last-child{border-bottom:none;}
+  .prod img{width:92px; height:92px; object-fit:contain; border:1px solid var(--line); border-radius:10px; background:#fff;}
+  .prod .noimg{width:92px; height:92px; border:1px dashed var(--line); border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--grey); font-size:11px; text-align:center; padding:6px;}
+  .prod h3{font-size:16.5px; font-weight:800;}
+  .prod .ean{font-size:12.5px; color:var(--grey); font-weight:600; margin-top:2px;}
+  .prod .note{font-size:12.5px; color:var(--grey); line-height:1.45; margin-top:6px; max-width:520px;}
+  .qty{background:var(--lime); border-radius:12px; padding:10px 16px; text-align:center; min-width:78px;}
+  .qty b{display:block; font-size:24px; font-weight:800; line-height:1;}
+  .qty span{font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.8px;}
+
+  .totals{display:flex; gap:14px; flex-wrap:wrap; margin-top:22px;}
+  .tot{flex:1; min-width:170px; background:var(--midnight); color:#fff; border-radius:12px; padding:16px 18px;}
+  .tot b{display:block; font-size:26px; font-weight:800;}
+  .tot span{font-size:12px; font-weight:500; color:var(--sky);}
+
+  .notes{margin-top:22px; background:#eef6fc; border-left:4px solid var(--shellyblue); border-radius:0 10px 10px 0; padding:14px 18px;}
+  .notes h4{font-size:13px; font-weight:800; margin-bottom:6px;}
+  .notes li{font-size:12.5px; line-height:1.55; color:var(--midnight); margin-left:16px;}
+
+  .guide{margin-top:22px; display:flex; gap:14px; align-items:center; background:var(--sky); border-radius:12px; padding:16px 20px;}
+  .guide .gi{font-size:24px;}
+  .guide p{font-size:13px; line-height:1.5;}
+  .guide a{color:var(--navy); font-weight:800; word-break:break-all;}
+
+  .rep-foot{background:#f6fafd; border-top:1px solid var(--line); padding:18px 32px; display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap;}
+  .rep-foot .c{font-size:13px; line-height:1.6;}
+  .rep-foot .c b{color:var(--navy);}
+  .rep-foot img{height:22px; opacity:.95;}
+  .disclaimer{font-size:11px; color:var(--grey); line-height:1.5; padding:12px 32px 20px; background:#f6fafd;}
+
+  .empty{padding:30px; text-align:center; color:var(--grey); font-weight:600;}
+
+  /* ===== Print (A4 report) ===== */
+  @media print{
+    @page{size:A4; margin:12mm;}
+    body{background:#fff;}
+    .hero, .card, .actions{display:none !important;}
+    .wrap{max-width:none; margin:0; padding:0;}
+    #report{display:block !important; margin:0;}
+    .report-card{box-shadow:none; border-radius:0;}
+    .rep-head{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
+    .qty, .tot, .chip, .notes, .guide{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
+    .prod{break-inside:avoid;}
+    a{text-decoration:none;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <img src="img/asset0.png" alt="Shelly">
+    <h1>IHC til Shelly konvertering</h1>
+    <p>Svar på spørgsmålene nedenfor, og få en komplet materialeliste med de rigtige Shelly-enheder til konverteringen – klar til at gemme eller printe som PDF.</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="card" aria-label="Spørgsmål">
+    <h2>Om installationen</h2>
+    <div class="qgrid">
+      <div class="q">
+        <label for="inp24">1. Antal 24V trykindgange</label>
+        <div class="hint">Tæl <b>indgange</b>, ikke knapper – flere tryk kan deles om samme indgang, når de skal styre samme udgang.</div>
+        <input type="number" id="inp24" min="0" value="0" inputmode="numeric">
+      </div>
+      <div class="q">
+        <label for="inpBlu">2. Antal batteritryk</label>
+        <div class="hint">Hele trådløse tryk med 4 knapper (erstatning for IHC Wireless).</div>
+        <input type="number" id="inpBlu" min="0" value="0" inputmode="numeric">
+      </div>
+      <div class="q">
+        <label for="inpRelay">3. Antal 230V relæudgange</label>
+        <div class="hint">Udgange til lys og andre belastninger, der skal tændes/slukkes.</div>
+        <input type="number" id="inpRelay" min="0" value="0" inputmode="numeric">
+      </div>
+      <div class="q">
+        <label for="inpDim">4. Antal lysdæmper-kanaler</label>
+        <div class="hint">Kanaler der skal kunne dæmpes (erstatter IHC Dimmer).</div>
+        <input type="number" id="inpDim" min="0" value="0" inputmode="numeric">
+      </div>
+      <div class="q">
+        <label>5. Ønskes energimåling i relæerne?</label>
+        <div class="hint">Energimåling kræver PM-relæer forsynet med 230V.</div>
+        <div class="toggle" id="togPM">
+          <button type="button" data-v="nej" class="on">Nej</button>
+          <button type="button" data-v="ja">Ja</button>
+        </div>
+      </div>
+      <div class="q">
+        <label>6. Ønskes særskilte inputmoduler (Metode 2)?<span class="rec">Anbefaling: Nej</span></label>
+        <div class="hint">Vi anbefaler i stedet overdragsrelæer – lidt mere fortrådning, men mindre programmering.</div>
+        <div class="toggle" id="togMod">
+          <button type="button" data-v="nej" class="on">Nej</button>
+          <button type="button" data-v="ja">Ja</button>
+        </div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" id="btnCalc">Beregn materialeliste</button>
+      <button class="btn btn-ghost" id="btnPrint">Gem / print som PDF</button>
+    </div>
+  </section>
+
+  <section id="report" aria-label="Konverteringsforslag"></section>
+</main>
+
+<script>
+const IMG = {
+  pro1: "img/asset1.jpg",
+  pro2: "img/asset2.jpg",
+  pro3: "img/asset3.jpg",
+  pro4pm: "img/asset4.jpg",
+  dim1pm: "img/asset5.jpg",
+  dim2pm: "img/asset6.jpg",
+  rgbww: "img/asset7.jpg",
+  blu4: "img/asset8.jpg"
+};
+const LOGO_WHITE = "img/asset9.png";
+const LOGO_BLUE = "img/asset10.png";
+
+const PRODUCTS = {
+  pro1:   {name:"Shelly Pro 1", ean:"3800235268001", din:1, img:IMG.pro1,
+           note:"Relæ med 1 udgang og 2 indgange. Forsynes med 24V DC, så svagstrømstryk kobles direkte på indgangen."},
+  pro2:   {name:"Shelly Pro 2", ean:"3800235268025", din:1, img:IMG.pro2,
+           note:"Relæ med 2 udgange og 2 indgange. Forsynes med 24V DC, så svagstrømstryk kobles direkte på indgangene. Fylder kun 1 modul i tavlen."},
+  pro4pm: {name:"Shelly Pro 4PM", ean:"3800235268049", din:3, img:IMG.pro4pm,
+           note:"4-kanals relæ med energimåling pr. kanal og display. Forsynes med 230V – 24V tryk tilsluttes via overdragsrelæ."},
+  dim2pm: {name:"Shelly Pro Dimmer 2PM", ean:"3800235268179", din:1, img:IMG.dim2pm,
+           note:"2-kanals lysdæmper med energimåling. 230V-enhed – ved fortrådet trykstyring anvendes overdragsrelæ pr. kanal."},
+  dim1pm: {name:"Shelly Pro Dimmer 1PM", ean:"3800235268162", din:1, img:IMG.dim1pm,
+           note:"1-kanals lysdæmper med energimåling. 230V-enhed – ved fortrådet trykstyring anvendes overdragsrelæ."},
+  rgbww:  {name:"Shelly Pro RGBWW PM", ean:"3800235268216", din:1, img:IMG.rgbww,
+           note:"Anvendes som 5-kanals 24V inputmodul til DIN-skinne. Indgangene styrer relæer og dæmpere trådløst og understøtter kort, dobbelt, tredobbelt og langt tryk."},
+  blu4:   {name:"Shelly BLU Wall Switch 4 ZB DK White", ean:"3800238073404", din:0, img:IMG.blu4,
+           note:"Trådløst Bluetooth-batteritryk med 4 knapper i dansk LK-design. Parres direkte med Shelly-enheder eller via scener i appen."},
+  relay24:{name:"Overdragsrelæ / interface-relæ 24V", ean:"– (ikke et Shelly-produkt)", din:null, img:null,
+           note:"Konverterer 24V-tryksignalet til relæets/dæmperens indgang. Kan fx købes hos elsag.dk (interface-/hjælperelæ 24V, 1 omskifter)."}
+};
+
+function toggleInit(id){
+  const t = document.getElementById(id);
+  t.querySelectorAll('button').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      t.querySelectorAll('button').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on');
+    });
+  });
+}
+toggleInit('togPM'); toggleInit('togMod');
+const togVal = id => document.querySelector('#'+id+' button.on').dataset.v === 'ja';
+
+function calc(){
+  const in24  = Math.max(0, parseInt(document.getElementById('inp24').value)  || 0);
+  const blu   = Math.max(0, parseInt(document.getElementById('inpBlu').value) || 0);
+  const relay = Math.max(0, parseInt(document.getElementById('inpRelay').value)|| 0);
+  const dim   = Math.max(0, parseInt(document.getElementById('inpDim').value) || 0);
+  const pm    = togVal('togPM');
+  const mod2  = togVal('togMod');
+
+  const items = [];      // {key, qty}
+  const notes = [];
+  const add = (key, qty) => { if(qty>0) items.push({key, qty}); };
+
+  // --- Lysdæmpere ---
+  add('dim2pm', Math.floor(dim/2));
+  add('dim1pm', dim % 2);
+
+  let relay24 = 0; // overdragsrelæer
+
+  if (mod2){
+    // Metode 2: særskilte inputmoduler – alle 24V indgange samles i Pro RGBWW PM
+    add('rgbww', Math.ceil(in24/5));
+    if (pm){
+      add('pro4pm', Math.ceil(relay/4));
+    } else {
+      add('pro2', Math.ceil(relay/2));
+    }
+    if (in24>0) notes.push("Metode 2: Indgangene på Shelly Pro RGBWW PM programmeres til at styre relæer og dæmpere – enten som scener i Shelly-appen eller via Direct Device-to-Device (lokalt WiFi).");
+    if (dim>0) notes.push("Lysdæmperne styres trådløst fra inputmodulet – der kræves ingen overdragsrelæer.");
+  } else if (pm){
+    // Energimåling: Pro 4PM + overdragsrelæ pr. 24V trykindgang (relæer og dæmpere)
+    add('pro4pm', Math.ceil(relay/4));
+    relay24 = in24;
+    if (in24>0) notes.push("Energimåling kræver 230V-forsyning af relæerne. Alle 24V trykindgange tilsluttes derfor via overdragsrelæer – lidt mere fortrådning, men minimal programmering.");
+  } else {
+    // Metode 1: kiprelæ – Pro 2 forsynes 24V, tryk direkte på indgangene
+    const dimInputs = Math.min(in24, dim);        // dæmper-indgange kræver overdragsrelæ
+    const relayInputs = in24 - dimInputs;
+    const need = Math.max(relayInputs, relay);
+    if (need > 0){
+      if (need % 2 === 1){ add('pro2', Math.floor(need/2)); add('pro1', 1); }
+      else { add('pro2', need/2); }
+    }
+    relay24 = dimInputs;
+    notes.push("Metode 1 (kiprelæ): Relæerne forsynes med 24V DC, og trykkene kobles direkte på indgangene. Basale tænd/sluk-funktioner virker altid – også uden WiFi og internet.");
+    if (dimInputs>0) notes.push("Lysdæmperne er 230V-enheder og kan ikke styres direkte med 24V. Der er derfor medregnet ét overdragsrelæ pr. dæmperkanal med fortrådet tryk.");
+  }
+
+  add('relay24', relay24);
+  add('blu4', blu);
+  if (blu>0) notes.push("Batteritrykkene (BLU Wall Switch 4) parres trådløst med Shelly-enhederne – enten direkte via Bluetooth eller gennem scener i Shelly-appen.");
+  notes.push("Ved belastning over 5A på en udgang skal der være minimum 10 mm luft omkring enheden for korrekt varmeafledning.");
+
+  render(items, notes, {in24, blu, relay, dim, pm, mod2});
+}
+
+function render(items, notes, a){
+  const rep = document.getElementById('report');
+  if (items.length === 0){
+    rep.style.display = 'block';
+    rep.innerHTML = '<div class="report-card"><div class="empty">Indtast mindst én værdi ovenfor for at beregne materialelisten.</div></div>';
+    document.getElementById('btnPrint').style.display = 'none';
+    return;
+  }
+  const dt = new Date().toLocaleDateString('da-DK', {day:'numeric', month:'long', year:'numeric'});
+  let totalUnits = 0, totalDin = 0, dinUnknown = false;
+  items.forEach(i => {
+    totalUnits += i.qty;
+    const d = PRODUCTS[i.key].din;
+    if (d === null) dinUnknown = true; else totalDin += d * i.qty;
+  });
+
+  const rows = items.map(i => {
+    const p = PRODUCTS[i.key];
+    const img = p.img
+      ? '<img src="'+p.img+'" alt="'+p.name+'">'
+      : '<div class="noimg">Se leverandør<br>(fx elsag.dk)</div>';
+    return '<div class="prod">'+img+
+      '<div><h3>'+p.name+'</h3><div class="ean">EAN: '+p.ean+'</div><div class="note">'+p.note+'</div></div>'+
+      '<div class="qty"><b>'+i.qty+'</b><span>stk.</span></div></div>';
+  }).join('');
+
+  const chips = [
+    '<span class="chip">24V trykindgange: <b>'+a.in24+'</b></span>',
+    '<span class="chip">Batteritryk: <b>'+a.blu+'</b></span>',
+    '<span class="chip">230V relæudgange: <b>'+a.relay+'</b></span>',
+    '<span class="chip">Lysdæmper-kanaler: <b>'+a.dim+'</b></span>',
+    '<span class="chip">Energimåling: <b>'+(a.pm?'Ja':'Nej')+'</b></span>',
+    '<span class="chip">Særskilte inputmoduler: <b>'+(a.mod2?'Ja (Metode 2)':'Nej')+'</b></span>'
+  ].join('');
+
+  rep.innerHTML =
+  '<div class="report-card">'+
+    '<div class="rep-head">'+
+      '<div style="display:flex; gap:18px; align-items:center;">'+
+        '<img src="'+LOGO_WHITE+'" alt="Shelly">'+
+        '<div class="rt"><h2>IHC til Shelly – Konverteringsforslag</h2>'+
+        '<p>Materialeliste udarbejdet ud fra oplysninger om installationen</p></div>'+
+      '</div>'+
+      '<div class="rep-date">Genereret<br><b>'+dt+'</b></div>'+
+    '</div>'+
+    '<div class="rep-body">'+
+      '<div class="chips">'+chips+'</div>'+
+      '<div class="sec-label">Materialeliste</div>'+
+      rows+
+      '<div class="totals">'+
+        '<div class="tot"><b>'+totalUnits+'</b><span>enheder i alt</span></div>'+
+        '<div class="tot"><b>'+totalDin+(dinUnknown?'+':'')+'</b><span>DIN-moduler i tavlen (ca.'+(dinUnknown?' – ekskl. overdragsrelæer':'')+')</span></div>'+
+      '</div>'+
+      '<div class="notes"><h4>Bemærkninger</h4><ul>'+notes.map(n=>'<li>'+n+'</li>').join('')+'</ul></div>'+
+      '<div class="guide"><div class="gi">📘</div><p><b>Fortrådningsdiagrammer og yderligere information:</b><br>'+
+        '<a href="https://shelly.guide/application-guide/ihc-til-shelly-konvertering-danish/">shelly.guide/application-guide/ihc-til-shelly-konvertering-danish</a></p></div>'+
+    '</div>'+
+    '<div class="rep-foot">'+
+      '<div class="c"><b>Spørgsmål? Vi hjælper gerne.</b><br>Shelly Europe – Nordics &nbsp;·&nbsp; <b>+45 6916 5666</b> &nbsp;·&nbsp; <b>nordics@shelly.com</b></div>'+
+      '<img src="'+LOGO_BLUE+'" alt="Shelly">'+
+    '</div>'+
+    '<div class="disclaimer">Der er flere måder at konvertere en IHC-installation til Shelly på. Listen ovenfor er vores bedste forslag ud fra de angivne oplysninger og er vejledende. Den endelige løsning skal altid vurderes af en autoriseret elinstallatør ud fra den konkrete installation.</div>'+
+  '</div>';
+
+  rep.style.display = 'block';
+  document.getElementById('btnPrint').style.display = 'inline-block';
+  rep.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+document.getElementById('btnCalc').addEventListener('click', calc);
+document.getElementById('btnPrint').addEventListener('click', ()=>window.print());
+</script>
+</body>
+</html>
